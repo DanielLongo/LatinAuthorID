@@ -13,15 +13,18 @@ def download():
 
 def playground():
     periods = ['republican', 'augustan', 'early_silver', 'late_silver']
-    print(list(corpus_texts_by_type.values())[:2])
+    # print(list(corpus_texts_by_type.values())[:2])
     # reader = get_corpus_reader(language='latin', corpus_name='sall.1.txt')
     latin_corpus = get_corpus_reader(corpus_name='latin_text_latin_library', language='latin')
     # filtered_reader, fileids, categories = assemble_corpus(latin_corpus, types_requested=periods,
     #                                                        type_dirs=corpus_directories_by_type,
     #                                                        type_files=corpus_texts_by_type)
     # print(len(list(filtered_reader.docs())))
-    print(len((list(latin_corpus.docs()))))
-    # sentences = list(latin_corpus.sents())
+    # print(len((list(latin_corpus.docs()))))
+    # print(list(latin_corpus.docs())[60])
+    sentences = list(latin_corpus.sents())
+    for sen in sentences:
+        print(sen)
     # print(len(sentences))
 
     # print("num docs", len(list(latin_corpus.docs())))
