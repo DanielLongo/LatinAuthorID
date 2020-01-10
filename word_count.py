@@ -29,8 +29,8 @@ display(HTML("&lt;style>.container { width:98% !important; }&lt;/style>"))
 nlp = spacy.load('en')
 
 
-def get_word_count_for_period(period):
-    docs = load_docs([period])
+def get_word_count_for_period(period, type_dirs=None):
+    docs = load_docs([period], type_dirs=type_dirs)
     cleaned_docs = []
     for doc in docs:
         cleaned_docs.append(preprocess(doc))
@@ -97,10 +97,18 @@ def get_words_counts():
 
 
 def playground():
-    print(get_words_counts())
+    # print(get_words_counts())
     # periods = ['republican', 'augustan', 'early_silver', 'late_silver']
     # print(corpus_directories_by_type.keys())
-    # print(corpus_directories_by_type.values())
+    authors = list(corpus_directories_by_type.values())
+    print("authors", list(authors))
+    print("type_dirs", corpus_directories_by_type)
+    print("type_files", corpus_texts_by_type)
+    # type_dirs = {"republican": ["./cicero"]}
+    type_dirs = {"republican": ["./caesar"]}
+    # type_dirs = None
+    print(get_word_count_for_period("republican", type_dirs=type_dirs))
+
     # print(list(corpus_texts_by_type.values()))
     # print(list(corpus_texts_by_type.keys()))
     # print(list(corpus_texts_by_type.values())[:2])

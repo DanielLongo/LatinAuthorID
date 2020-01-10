@@ -7,7 +7,6 @@ from cltk.tokenize.word import WordTokenizer
 from cltk.stem.lemma import LemmaReplacer
 import re
 
-
 def remove_numbers(text):
     for i in range(10):
         text = text.replace(str(i), "")
@@ -30,6 +29,11 @@ def remove_latin_library_items(text):
     # text = text.strip()
 
 
+def split_count(s, count):
+    split = s.split(" ")
+    return [" ".join(split[i: i + count]) for i in range(0, len(split), count)]
+
+
 def preprocess(doc):
     assert (type(doc) == str)
     word_tokenizer = WordTokenizer('latin')
@@ -47,9 +51,14 @@ def preprocess(doc):
     return cleaned
 
 
-def load_docs(types_requested):
+def load_docs(types_requested, type_dirs=None):
     latin_corpus = get_corpus_reader(corpus_name='latin_text_latin_library', language='latin')
-    reader = assemble_corpus(latin_corpus, types_requested=types_requested, type_dirs=corpus_directories_by_type,
-                             type_files=corpus_texts_by_type)
+    if type_dirs is None:
+        reader = assemble_corpus(latin_corpus, types_requested=types_requested, type_dirs=corpus_directories_by_type,
+                                 type_files=corpus_texts_by_type)
+    else:
+        print("special type dirs", type_dirs)
+        reader = assemble_corpus(latin_corpus, types_requested=types_requested, type_dirs=type_dirs)  # ,
+        # type_files=corpus_texts_by_type)
     docs = list(reader.docs())
     return docs
