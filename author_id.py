@@ -2,8 +2,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC, SVC
 from sklearn.utils import shuffle
-
+import _pickle as cPickle
 import numpy as np
 import pandas as pd
 from utils import *
@@ -42,12 +43,27 @@ def get_text_by_authors(authors):
 
 
 def load_data():
-    authors = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican"), ("lucretius", "republican"),
-               ("livy", "augustan"), ("ovid", "augustan"), ("horace", "augustan"), ("vergil", "augustan"),
+    # authors = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican"), ("lucretius", "republican"),
+    #            ("livy", "augustan"), ("ovid", "augustan"), ("horace", "augustan"), ("vergil", "augustan"),
+    #            ("hyginus", "augustan")]
+
+    republican = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican"),
+                  ("lucretius", "republican")]
+
+    augustan = [("livy", "augustan"), ("ovid", "augustan"), ("horace", "augustan"), ("vergil", "augustan"),
                ("hyginus", "augustan")]
 
+    early_silver = [("martial", "early_silver"), ("juvenal", "early_silver"), ("tacitus", "early_silver"),
+         ("lucan", "early_silver"), ("quintilian", "early_silver"), ("sen", "early_silver"),
+         ("statius", "early_silver"), ("silius", "early_silver"), ("columella", "early_silver")]
+
+    authors = republican + augustan + early_silver
+
+    print("Authors:", authors)
+    # authors = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican")]
+
     text_df = get_text_by_authors(authors)
-    text_df.to_csv("./text_df/text-rep_aug.csv", index=False)
+    # text_df.to_csv("./text_df/text-rep_aug.csv", index=False)
     text_df = shuffle(text_df)
     y = text_df["author"]
     labelencoder = LabelEncoder()
@@ -72,22 +88,45 @@ def load_data():
     return text_bow_train, text_bow_test, y_train, y_test
 
 
+def save_model(model, filename):
+    with open(filename + ".pkl", "wb") as fid:
+        cPickle.dump(model, fid)
+
+
+def load_model(filename):
+    with open(filename + ".pkl", "rb") as fid:
+        model = cPickle.load(fid)
+        return model
+
+
 def main():
     text_bow_train, text_bow_test, y_train, y_test = load_data()
 
-    print(y_test)
+    # y_train_hot = np.zeros((y_train.size, y_train.max() + 1))
+    # y_train_hot[np.arange(y_train.size), y_train] = 1
+    #
+    # y_test_hot = np.zeros((y_test.size, y_train.max() + 1))
+    # y_test_hot[np.arange(y_test.size), y_test] = 1
+
+    # y_train = y_test_hot
+    # y_test = y_test_hot
+
+    # print(y_test)
+
+    # Prints numbers of each class
     counts = np.bincount(y_test)
     ii = np.nonzero(counts)[0]
     print(list(zip(ii, counts[ii])))
 
 
-    print(y_test[0])
-    print(text_bow_test[0])
+    # print(y_test[0])
+    # print(text_bow_test[0])
 
-    model = MultinomialNB()
+    # model = MultinomialNB()
+    # model = LinearSVC()
+    model = SVC(probability=True)
 
     model = model.fit(text_bow_train, y_train)
-
     print("Train Accuracy")
     print(model.score(text_bow_train, y_train))
 
@@ -95,6 +134,9 @@ def main():
 
     print(model.score(text_bow_test, y_test))
 
+    pred = model.predict_proba(text_bow_test[0])
+    print(pred)
+    save_model(model, "./saved_models/SVC-testA")
 
 
 if __name__ == "__main__":
