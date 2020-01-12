@@ -9,8 +9,10 @@ import numpy as np
 import pandas as pd
 from utils import *
 
-
 # def count_vectorize()
+
+SPLIT_LENGTH = 200
+
 
 def get_df_for_author(author, period):
     texts_df = pd.DataFrame(columns=["author", "text"])
@@ -22,7 +24,7 @@ def get_df_for_author(author, period):
         cleaned_docs.append(remove_latin_library_items(preprocess(doc)))
     rows = []
     for i, cleaned_doc in enumerate(cleaned_docs):
-        split_docs = split_count(cleaned_doc, 200)  # splits into 50 word chuncks
+        split_docs = split_count(cleaned_doc, SPLIT_LENGTH)  # splits into 50 word chuncks
         for split_doc in split_docs:
             cur_doc = {"author": author, "text": split_doc}
             rows.append(cur_doc)
@@ -51,11 +53,11 @@ def load_data():
                   ("lucretius", "republican")]
 
     augustan = [("livy", "augustan"), ("ovid", "augustan"), ("horace", "augustan"), ("vergil", "augustan"),
-               ("hyginus", "augustan")]
+                ("hyginus", "augustan")]
 
     early_silver = [("martial", "early_silver"), ("juvenal", "early_silver"), ("tacitus", "early_silver"),
-         ("lucan", "early_silver"), ("quintilian", "early_silver"), ("sen", "early_silver"),
-         ("statius", "early_silver"), ("silius", "early_silver"), ("columella", "early_silver")]
+                    ("lucan", "early_silver"), ("quintilian", "early_silver"), ("sen", "early_silver"),
+                    ("statius", "early_silver"), ("silius", "early_silver"), ("columella", "early_silver")]
 
     authors = republican + augustan + early_silver
 
@@ -79,6 +81,10 @@ def load_data():
     # executed...
     bow_transformer = CountVectorizer().fit(X_train)
 
+    save_model(bow_transformer, "bow_transformer_2")
+    # print("DONE")
+    # return
+
     # transforming into Bag-of-Words and hence textual data to numeric..
     text_bow_train = bow_transformer.transform(X_train)  # ONLY TRAINING DATA
 
@@ -97,6 +103,36 @@ def load_model(filename):
     with open(filename + ".pkl", "rb") as fid:
         model = cPickle.load(fid)
         return model
+
+
+def classify_text(text):
+    model_filename = "./saved_models/SVC-testA_2"
+    model = load_model(model_filename)
+
+    text = remove_latin_library_items(preprocess(text))
+    print(text)
+    chunks = split_count(text, SPLIT_LENGTH)
+
+    results = []
+
+    bow_transformer_filename = "bow_transformer_2"
+    bow_transformer = load_model(bow_transformer_filename)
+
+    chunks = bow_transformer.transform(chunks)
+    for chunk in chunks:
+        cur_pred = model.predict_proba(chunk)
+        results.append(cur_pred)
+
+    results = np.squeeze(np.asarray(results))
+    print("results", results, results.shape)
+    averages = results.mean(0)
+    print("averages", averages)
+    return averages
+
+
+def test_classify_text():
+    text = "ruerint Danai, quaeque ipse miserrima vidi 5 et quorum pars magna fui. quis talia fando Myrmidonum Dolopumve aut duri miles Ulixi temperet a lacrimis? et iam nox umida caelo praecipitat suadentque cadentia sidera somnos. sed si tantus amor casus cognoscere nostros               10 et breviter Troiae supremum audire laborem, quamquam animus meminisse horret luctuque refugit, incipiam. fracti bello fatisque repulsi ductores Danaum tot iam labentibus annis instar montis equum divina Palladis arte               15 aedificant, sectaque intexunt abiete costas; votum pro reditu simulant; ea fama vagatur. huc delecta virum sortiti corpora furtim includunt caeco lateri penitusque cavernas ingentis uterumque armato milite complent.               20 est in conspectu Tenedos, notissima fama insula, dives opum Priami dum regna manebant, nunc tantum sinus et statio male fida carinis: huc se provecti deserto in litore condunt; nos abiisse rati et vento petiisse Mycenas.               25 ergo omnis longo soluit se Teucria luctu; panduntur portae, iuvat ire et Dorica castra desertosque videre locos litusque relictum: hic Dolopum manus, hic saevus tendebat Achilles; classibus hic locus, hic acie certare solebant.               30 pars stupet innuptae donum exitiale Minervae et molem mirantur equi; primusque Thymoetes duci intra muros hortatur et arce locari, sive dolo seu iam Troiae sic fata ferebant. at Capys, et quorum melior sententia menti,               35 aut pelago Danaum insidias suspectaque dona praecipitare iubent subiectisque urere flammis, aut terebrare cavas uteri et temptare latebras. scinditur incertum studia in contraria vulgus. Primus ibi ante omnis magna comitante caterv"
+    classify_text(text)
 
 
 def main():
@@ -118,7 +154,6 @@ def main():
     ii = np.nonzero(counts)[0]
     print(list(zip(ii, counts[ii])))
 
-
     # print(y_test[0])
     # print(text_bow_test[0])
 
@@ -136,8 +171,9 @@ def main():
 
     pred = model.predict_proba(text_bow_test[0])
     print(pred)
-    save_model(model, "./saved_models/SVC-testA")
+    save_model(model, "./saved_models/SVC-testA_2")
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    test_classify_text()
