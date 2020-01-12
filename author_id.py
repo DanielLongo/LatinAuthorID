@@ -43,6 +43,10 @@ def get_text_by_authors(authors):
     combined_frames = pd.concat(frames)
     return combined_frames
 
+# AUTHORS = ["cicero", "caesar", "nepos", "lucretius", "livy", "ovid", "horace", "vergil", "hyginus", "martial",
+#            "juvenal", "tacitus", "lucan", "quintilian", "sen", "statius", "silius", "columella"]
+AUTHORS = ['caesar', 'cicero', 'columella', 'horace', 'hyginus', 'juvenal', 'livy', 'lucan', 'lucretius', 'martial', 'nepos',
+ 'ovid', 'quintilian', 'sen', 'silius', 'statius', 'tacitus', 'vergil']
 
 def load_data():
     # authors = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican"), ("lucretius", "republican"),
@@ -60,6 +64,7 @@ def load_data():
                     ("statius", "early_silver"), ("silius", "early_silver"), ("columella", "early_silver")]
 
     authors = republican + augustan + early_silver
+    authors = sorted(authors, key=lambda x: x[0])
 
     print("Authors:", authors)
     # authors = [("cicero", "republican"), ("caesar", "republican"), ("nepos", "republican")]
@@ -81,7 +86,7 @@ def load_data():
     # executed...
     bow_transformer = CountVectorizer().fit(X_train)
 
-    save_model(bow_transformer, "bow_transformer_2")
+    save_model(bow_transformer, "bow_transformer_3")
     # print("DONE")
     # return
 
@@ -127,12 +132,14 @@ def classify_text(text):
     print("results", results, results.shape)
     averages = results.mean(0)
     print("averages", averages)
+    print("authors", AUTHORS)
     return averages
 
 
 def test_classify_text():
-    text = "ruerint Danai, quaeque ipse miserrima vidi 5 et quorum pars magna fui. quis talia fando Myrmidonum Dolopumve aut duri miles Ulixi temperet a lacrimis? et iam nox umida caelo praecipitat suadentque cadentia sidera somnos. sed si tantus amor casus cognoscere nostros               10 et breviter Troiae supremum audire laborem, quamquam animus meminisse horret luctuque refugit, incipiam. fracti bello fatisque repulsi ductores Danaum tot iam labentibus annis instar montis equum divina Palladis arte               15 aedificant, sectaque intexunt abiete costas; votum pro reditu simulant; ea fama vagatur. huc delecta virum sortiti corpora furtim includunt caeco lateri penitusque cavernas ingentis uterumque armato milite complent.               20 est in conspectu Tenedos, notissima fama insula, dives opum Priami dum regna manebant, nunc tantum sinus et statio male fida carinis: huc se provecti deserto in litore condunt; nos abiisse rati et vento petiisse Mycenas.               25 ergo omnis longo soluit se Teucria luctu; panduntur portae, iuvat ire et Dorica castra desertosque videre locos litusque relictum: hic Dolopum manus, hic saevus tendebat Achilles; classibus hic locus, hic acie certare solebant.               30 pars stupet innuptae donum exitiale Minervae et molem mirantur equi; primusque Thymoetes duci intra muros hortatur et arce locari, sive dolo seu iam Troiae sic fata ferebant. at Capys, et quorum melior sententia menti,               35 aut pelago Danaum insidias suspectaque dona praecipitare iubent subiectisque urere flammis, aut terebrare cavas uteri et temptare latebras. scinditur incertum studia in contraria vulgus. Primus ibi ante omnis magna comitante caterv"
+    text = "Me perlongo intervallo prope memoriae temporumque nostrorum primum hominem novum consulem fecistis et eum locum quem nobilitas praesidiis firmatum atque omni ratione obvallatum tenebat me duce rescidistis virtutique in posterum patere voluistis. Neque me tantum modo consulem, quod est ipsum per sese amplissimum, sed ita fecistis quo modo pauci nobiles in hac civitate consules facti sunt, novus ante me nemo. Nam profecto, si recordari volueritis de novis hominibus, reperietis eos qui sine repulsa consules facti sunt diuturno labore atque aliqua occasione esse factos, cum multis annis post petissent quam praetores fuissent, aliquanto serius quam per aetatem ac per leges liceret; qui autem anno suo petierint, sine repulsa non esse factos; me esse unum ex omnibus novis hominibus de quibus meminisse possimus, qui consulatum petierim cum primum licitum sit, consul factus sim cum primum petierim, ut vester honos ad mei temporis diem petitus, non ad alienae petitionis occasionem interceptus, nec diuturnis precibus efflagitatus, sed dignitate impetratus esse videatur. [4] Est illud amplissimum quod paulo ante commemoravi, Quirites, quod hoc honore ex novis hominibus primum me multis post annis adfecistis, quod prima petitione, quod anno meo, sed tamen magnificentius atque ornatius esse illo nihil potest, quod meis comitiis non tabellam vindicem tacitae libertatis, sed vocem vivam prae vobis indicem vestrarum erga me voluntatum ac studiorum tulistis. Itaque me non extrema diribitio suffragiorum, sed primi illi vestri concursus, neque singulae voces praeconum, sed una vox universi populi Romani consulem declaravit. [5] Hoc ego tam insigne, tam singulare vestrum beneficium, Quirites, cum ad animi mei fructum atque laetitiam duco esse permagnum, tum ad curam sollicitudinemque multo magis. Versantur enim, Quirites, in animo meo multae et graves cogitationes quae mihi nullam partem neque diurnae neque nocturnae quietis impertiunt, primum tuendi consulatus, quae cum omnibus est difficilis et magna ratio, tum vero mihi praeter ceteros cuius errato nulla venia, recte facto exigua laus et ab invitis expressa proponitur; non dubitanti fidele consilium, non laboranti certum subsidium nobilitatis ostenditur. [6] Quod si solus in discrimen aliquod adducerer, ferrem, Quirites, animo aequiore; sed mihi videntur certi homines, si qua in re me non modo consilio verum etiam casu lapsum esse arbitrabuntur, vos universos qui me antetuleritis nobilitati vituperaturi. Mihi autem, Quirites, omnia potius perpetienda esse duco quam non ita gerendum consulatum ut in omnibus meis factis atque consiliis vestrum de me factum consiliumque laudetur. Accedit etiam ille mihi summus labor ac difficillima ratio consulatus gerendi, quod non eadem mihi qua superioribus consulibus lege et condicione utendum esse decrevi, qui aditum huius loci conspectumque vestrum partim magno opere fugerunt, partim non vehementer secuti sunt. Ego autem non solum hoc in loco dicam ubi est id dictu facillimum, sed in ipso senatu in quo esse locus huic voci non videbatur popularem me futurum esse consulem prima illa mea oratione Kalendis Ianuariis dixi. [7] Neque enim ullo modo facere possum ut, cum me intellegam non hominum potentium studio, non excellentibus gratiis paucorum, sed universi populi Romani iudicio consulem ita factum ut nobilissimis hominibus longe praeponerer, non et in hoc magistratu et in omni vita <videar> esse popularis. Sed mihi ad huius <verbi> vim et interpretationem vehementer opus est vestra sapientia. Versatur enim magnus error propter insidiosas non nullorum simulationes qui, cum populi non solum commoda verum etiam salutem oppugnant et impediunt, oratione adsequi volunt ut populares esse videantur. [8] Ego qualem Kalendis Ianuariis acceperim rem publicam, Quirites, intellego, plenam sollicitudinis, plenam timoris; in qua nihil erat mali, nihil adversi quod non boni metuerent, improbi exspectarent; omnia turbulenta consilia contra hunc rei publicae statum et contra vestrum otium partim iniri, partim nobis consulibus designatis inita esse dicebantur; sublata erat de foro fides non ictu aliquo novae calamitatis, sed suspicione ac perturbatione iudicio"
     classify_text(text)
+
 
 
 def main():
@@ -171,9 +178,9 @@ def main():
 
     pred = model.predict_proba(text_bow_test[0])
     print(pred)
-    save_model(model, "./saved_models/SVC-testA_2")
+    save_model(model, "./saved_models/SVC-testA_3")
 
 
 if __name__ == "__main__":
-    # main()
-    test_classify_text()
+    main()
+    # test_classify_text()
