@@ -23,8 +23,8 @@ def remove_latin_library_items(text):
     digits_removed = remove_numbers(brackets_removed)
     dash_removed = digits_removed.replace("-", "")
     split = dash_removed.split(" ")
-    cropped = split[15:-15]
-    # cropped = split
+    # cropped = split[15:-15]
+    cropped = split
     joined = " ".join(cropped)
     return joined
     # text = text.strip()
